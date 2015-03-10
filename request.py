@@ -12,17 +12,18 @@ class NormalRequest(Request):
     def execute(self, params):
         method = params.method()
         url = params.url()
-        param = self._extract(params)
+        param = self._extract(method, params)
         return requests.request(
                 method,
                 url,
                 **param
                 )
 
-    def _extract(self, params):
-        return {
-                'headers': params.headers()
-                }
+    def _extract(self, method, params):
+        param = { 'headers': params.headers() }
+        if method in ('post', 'put'):
+            param.update({ 'data': params.data() })
+        return param
 
 def buildRequest(reqType):
     if reqType == Request.REQUEST_NORMAL:
