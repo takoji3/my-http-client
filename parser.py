@@ -10,6 +10,7 @@ def argParse():
     parser.add_argument('--data', nargs='*', type=str)
     args = parser.parse_args()
 
+    print(args)
     return Parameters(args)
 
 class Parameters:

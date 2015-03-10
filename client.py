@@ -3,7 +3,7 @@
 from parser import argParse
 from request import buildRequest
 
-def run():
+def main():
     params = argParse()
     request = buildRequest(params.requestType())
     response = request.execute(params)
@@ -12,4 +12,4 @@ def run():
     print response.content
 
 if __name__ == '__main__':
-    run()
+    main()
