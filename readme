@@ -1,0 +1,17 @@
+Simple http client
+
+This is http client tools which wrapping some famous modules for cli. We can use at python2.* environment.
+
+## usage
+
+```
+python client.py [method] [url] [options]
+```
+
+## test
+
+I use `unittest` module for unit test.
+
+```
+python -m unittest discover
+```
