@@ -15,19 +15,16 @@ class Request:
     def execute(self, params):
         method = params.method()
         url = params.url()
-        param = self.__extract(method, params)
+        param = { 'headers': params.headers() }
+        if method in ('post', 'put'):
+            param.update({ 'data': params.data() })
+
         res = self._request.request(
                 method,
                 url,
                 **param
                 )
         return Response(res, params)
-
-    def __extract(self, method, params):
-        param = { 'headers': params.headers() }
-        if method in ('post', 'put'):
-            param.update({ 'data': params.data() })
-        return param
 
 class PlainRequest(Request):
     def __init__(self):
