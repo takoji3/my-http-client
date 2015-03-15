@@ -1,21 +1,22 @@
 #-*- coding: utf-8 -*-
 
 import argparse
+from request import REQUEST_PLAIN,REQUEST_OAUTH
 
 def arg_parse():
     parser = argparse.ArgumentParser()
     parser.add_argument('method', type=str)
     parser.add_argument('url', type=str)
-    parser.add_argument('--type', type=str, default='plain', required=False)
-    parser.add_argument('--headers', nargs='*', type=str)
+    parser.add_argument('--type', type=str, choices=[REQUEST_PLAIN, REQUEST_OAUTH], default='plain', required=False)
+    parser.add_argument('--headers', nargs='*', type=str, default={})
     parser.add_argument('--data', nargs='*', type=str)
     parser.add_argument('--consumer_key', type=str, required=False)
     parser.add_argument('--consumer_secret', type=str, required=False)
     parser.add_argument('--access_token', type=str, required=False)
     parser.add_argument('--access_token_secret', type=str, required=False)
+    parser.add_argument('-d', nargs='?', const=True, default=False, type=bool, required=False)
     args = parser.parse_args()
 
-    print(args)
     return Parameters(args)
 
 class Parameters:
@@ -48,3 +49,5 @@ class Parameters:
         finally:
             return oauth_params
 
+    def debug(self):
+        return self._params.d
