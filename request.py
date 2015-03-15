@@ -2,53 +2,45 @@
 
 import requests
 from requests_oauthlib import OAuth1Session
+from response import Response
+
+REQUEST_PLAIN = 'plain'
+REQUEST_OAUTH = 'oauth'
 
 class Request:
-    REQUEST_PLAIN = 'plain'
-    REQUEST_OAUTH = 'oauth'
+
+    def __init__(self):
+        raise NotImplementedError
 
     def execute(self, params):
-        raise NotImplementedError("Implement execute method")
+        method = params.method()
+        url = params.url()
+        param = self.__extract(method, params)
+        res = self._request.request(
+                method,
+                url,
+                **param
+                )
+        return Response(res, params)
+
+    def __extract(self, method, params):
+        param = { 'headers': params.headers() }
+        if method in ('post', 'put'):
+            param.update({ 'data': params.data() })
+        return param
 
 class PlainRequest(Request):
-    def execute(self, params):
-        method = params.method()
-        url = params.url()
-        param = self.__extract(method, params)
-        return requests.request(
-                method,
-                url,
-                **param
-                )
-
-    def __extract(self, method, params):
-        param = { 'headers': params.headers() }
-        if method in ('post', 'put'):
-            param.update({ 'data': params.data() })
-        return param
+    def __init__(self):
+        self._request = requests
 
 class OAuthRequest(Request):
-    def execute(self, params):
-        req = OAuth1Session(*params.oauth_parameters())
-        method = params.method()
-        url = params.url()
-        param = self.__extract(method, params)
-        return req.request(
-                method,
-                url,
-                **param
-                )
+    def __init__(self, oauth_parameters):
+        self._request = OAuth1Session(*oauth_parameters)
 
-    def __extract(self, method, params):
-        param = { 'headers': params.headers() }
-        if method in ('post', 'put'):
-            param.update({ 'data': params.data() })
-        return param
-
-def build_request(req_type):
-    if req_type == Request.REQUEST_PLAIN:
+def build_request(parameters):
+    if parameters.request_type() == REQUEST_PLAIN:
         return PlainRequest()
-    elif req_type.startswith(Request.REQUEST_OAUTH):
-        return OAuthRequest()
+    elif parameters.request_type().startswith(REQUEST_OAUTH):
+        return OAuthRequest(parameters.oauth_parameters())
     else:
         raise NotImplementedError('Undefined request type')
